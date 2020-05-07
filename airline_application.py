@@ -29,3 +29,27 @@ class AirlineApplication:
             departureTimeStr = r[3].strftime('%m/%d/%y %I:%M %p')
             flights.append('%s flight #%d:  %s -> %s   %s' % (r[4], r[0], r[1], r[2], departureTimeStr))
         return flights
+
+    # Find which seats are available to book for a given flight
+    # Returns a list of strings, each of which is a seat name (i.e. ['2A', '3D'])
+    def get_available_seats(self, flightId=1):
+        self.cursor.callproc('GetAvailableSeats', (flightId,))
+        results = self.get_results_from_procedure()
+
+        return [result[0] for result in results]
+
+    # Books a single ticket for a flight given a flightId, seatType (adult, child, etc), and seat name (1A, 3B, etc)
+    # Inserts an entry into the Ticket table and returns a string representation of the ticket that was purchased
+    def book_flight(self, flightId=1, userId=1, seatType='', seatName=''):
+        self.cursor.callproc('BookFlight', (flightId, userId, seatType, seatName))
+        self.conn.commit()
+        ticket_info = self.get_results_from_procedure()
+        t = ticket_info[0]
+
+        return '%s #%d  %s Ticket  Seat %s (%s class)  Departs at %s' % (t[0], t[1], t[3], t[2], t[4], t[5].strftime('%m/%d/%y %I:%M %p'))
+
+    # Returns a list of strings representing all the tickets for future flights the user has purchased
+    # Strings are in the form:
+    # CID -> DEN  American Airlines #121  Adult  Seat 3A (Business class)  Departs at 05/08/20 01:37 PM
+    def find_user_trips(self, userId=1):
+        self.cursor.callproc('FindUserTrips', (userId))
