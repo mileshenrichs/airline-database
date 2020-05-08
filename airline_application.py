@@ -14,27 +14,30 @@ class AirlineApplication:
     # Call this method directly after executing cursor.callproc() to list the result set of the stored procedure.
     # The way that stored procedures are returned by the cursor is a little confusing, so all the logic is
     # encapsulated in this helper method.
-    def get_results_from_procedure(self):
+    def _get_results_from_procedure(self):
         return [r for buffer in self.cursor.stored_results() for r in buffer.fetchall()]
+
+    @staticmethod
+    def _date_to_str(date):
+        return date.strftime('%m/%d/%y %I:%M %p')
 
     # Search for flights which can be booked
     # Returns a list of strings in the following format:
     # American Airlines flight #121:  CID -> DEN   05/08/20 01:37 PM
     def search_flights(self, fromAirport='', toAirport='', departAfter='', departBefore='', americanOnly=True):
         self.cursor.callproc('SearchFlights', (fromAirport, toAirport, departAfter, departBefore, americanOnly))
-        results = self.get_results_from_procedure()
+        results = self._get_results_from_procedure()
         
         flights = []
         for r in results:
-            departureTimeStr = r[3].strftime('%m/%d/%y %I:%M %p')
-            flights.append('%s flight #%d:  %s -> %s   %s' % (r[4], r[0], r[1], r[2], departureTimeStr))
+            flights.append('%s flight #%d:  %s -> %s   %s' % (r[4], r[0], r[1], r[2], self._date_to_str(r[3])))
         return flights
 
     # Find which seats are available to book for a given flight
     # Returns a list of strings, each of which is a seat name (i.e. ['2A', '3D'])
     def get_available_seats(self, flightId=1):
         self.cursor.callproc('GetAvailableSeats', (flightId,))
-        results = self.get_results_from_procedure()
+        results = self._get_results_from_procedure()
 
         return [result[0] for result in results]
 
@@ -43,13 +46,20 @@ class AirlineApplication:
     def book_flight(self, flightId=1, userId=1, seatType='', seatName=''):
         self.cursor.callproc('BookFlight', (flightId, userId, seatType, seatName))
         self.conn.commit()
-        ticket_info = self.get_results_from_procedure()
+        ticket_info = self._get_results_from_procedure()
         t = ticket_info[0]
 
-        return '%s #%d  %s Ticket  Seat %s (%s class)  Departs at %s' % (t[0], t[1], t[3], t[2], t[4], t[5].strftime('%m/%d/%y %I:%M %p'))
+        return '%s #%d  %s Ticket  Seat %s (%s class)  Departs at %s' % (t[0], t[1], t[3], t[2], t[4], self._date_to_str(t[5]))
 
     # Returns a list of strings representing all the tickets for future flights the user has purchased
     # Strings are in the form:
     # CID -> DEN  American Airlines #121  Adult  Seat 3A (Business class)  Departs at 05/08/20 01:37 PM
     def find_user_trips(self, userId=1):
-        self.cursor.callproc('FindUserTrips', (userId))
+        self.cursor.callproc('FindUserTrips', (userId,))
+        results = self._get_results_from_procedure()
+
+        tickets = []
+        for r in results:
+            tickets.append('%s -> %s  %s #%d  %s  Seat %s (%s class)  Departs at %s' 
+                                % (r[0], r[1], r[2], r[3], r[4], r[5], r[6], self._date_to_str(r[7])))
+        return tickets

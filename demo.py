@@ -31,6 +31,12 @@ def run_demo():
     print(seats)
 
     print('\n\n')
+
+    # Find my trips (tickets registered to user)
+    print('Find my trips')
+    tickets = app.find_user_trips(userId=1)
+    for ticket in tickets:
+        print(ticket)
     
 
 if __name__ == '__main__':
