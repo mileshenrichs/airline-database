@@ -21,6 +21,28 @@ class AirlineApplication:
     def _date_to_str(date):
         return date.strftime('%m/%d/%y %I:%M %p')
 
+    # Register a new user by providing necessary account details.
+    # Returns the user id of the newly created user.
+    def register_user(self, username='', password='', title=None, firstName='', middleName=None, lastName='', suffix=None, 
+                        preferredName=None, dateOfBirth='', gender='', country='', addressLine1='', addressLine2=None, 
+                        city='', email='', phoneType='', phoneNumber=''):
+        self.cursor.callproc('CreateUser', (username, password, title, firstName, middleName, lastName, suffix,
+                                            preferredName, dateOfBirth, gender, country, addressLine1, addressLine2,
+                                            city, email, phoneType, phoneNumber))
+        self.conn.commit()
+        user_id = self._get_results_from_procedure()[0]
+        return user_id
+
+    # Log in a user by providing credentials (username and password).
+    # Returns user id if login was successful, -1 otherwise.
+    def log_in(self, username='', password=''):
+        self.cursor.callproc('LogIn', (username, password))
+        result = self._get_results_from_procedure()[0]
+
+        if bool(result[0]):
+            return result[1]
+        return -1
+
     # Search for flights which can be booked
     # Returns a list of strings in the following format:
     # American Airlines flight #121:  CID -> DEN   05/08/20 01:37 PM

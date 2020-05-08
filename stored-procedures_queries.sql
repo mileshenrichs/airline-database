@@ -1,5 +1,43 @@
 use db_class_airline;
 
+-- Log in user query
+DROP PROCEDURE IF EXISTS LogIn;
+
+DELIMITER $$
+CREATE PROCEDURE LogIn(un VARCHAR(30), pw VARCHAR(30))
+BEGIN
+	SELECT COUNT(un), id FROM User
+		WHERE un = username
+		AND pw = password;
+END$$
+DELIMITER ;
+
+CALL LogIn('user1', 'password1');
+
+-- Register new user query
+DROP PROCEDURE IF EXISTS CreateUser;
+
+DELIMITER $$
+CREATE PROCEDURE CreateUser(
+	un VARCHAR(30), pw VARCHAR(30), ttl VARCHAR(30),
+    fn VARCHAR(30), mn VARCHAR(30), ln VARCHAR(30),
+    sfx VARCHAR(5), pn VARCHAR(30), dob DATE,
+    gd VARCHAR(6), cnt VARCHAR(50), al1 VARCHAR(70),
+    al2 VARCHAR(70), ct VARCHAR(50), em VARCHAR(70),
+    pt VARCHAR(20), phn VARCHAR(14))
+BEGIN
+	INSERT INTO User 
+		(username, password, title, firstName, middleName, lastName, suffix, preferredName, dateOfBirth,
+         gender, country, addressLine1, addressLine2, city, email, phoneType, phoneNumber)
+        VALUES (un, pw, ttl, fn, mn, ln, sfx, pn, dob, gd, cnt, al1, al2, ct, em, pt, phn);
+        
+	SELECT LAST_INSERT_ID();
+END$$
+DELIMITER ;
+
+CALL CreateUser('miles', 'securepassword', NULL, 'Miles', NULL, 'Henrichs', NULL, NULL, '1998-04-09', 'male', 'United States',
+				'615 Elm St', NULL, 'Iowa City', 'miles-henrichs@uiowa.edu', 'mobile', '3191234567');
+
 -- Search flights query
 DROP PROCEDURE IF EXISTS SearchFlights;
 

@@ -4,6 +4,22 @@ import datetime
 def run_demo():
     app = AirlineApplication()
 
+    # Register user and save new user id
+    print('Register user and save new user id')
+    user_id = app.register_user(username='miles', password='securepassword', firstName='Miles', lastName='Henrichs', 
+                                dateOfBirth='1998-04-09', gender='male', country='United States', addressLine1='415 Elm St', 
+                                city='Iowa City', email='miles-henrichs@uiowa.edu', phoneType='mobile', phoneNumber='3191234567')
+    print('Newly created user id is %d' % (user_id))
+
+    print('\n\n')
+
+    # Log in user with username = "user1" and password = "password1"
+    print('Log in user with username = "user1" and password = "password1"')
+    user_id = app.log_in(username='user1', password='password1')
+    print('User id is %d' % (user_id,))
+
+    print('\n\n')
+
     # Search for flights from Cedar Rapids to Denver that depart in the next couple of days
     print('Search for flights from Cedar Rapids to Denver that depart in the next couple of days')
     flights = app.search_flights(fromAirport='CID', toAirport='DEN', 
