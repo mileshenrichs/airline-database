@@ -125,3 +125,50 @@ DELIMITER ;
 CALL FindUserTrips(1);
 
 
+-- Create user notification query
+DROP PROCEDURE IF EXISTS AddNotification;
+
+DELIMITER $$
+CREATE PROCEDURE AddNotification(idForFlight INT, doDepartureReminder TINYINT(1), doArrivalUpdates TINYINT(1), emailAddr VARCHAR(70), phoneNo VARCHAR(14))
+BEGIN
+	INSERT INTO Notification (forFlightId, departureReminder, arrivalUpdates , emailAddress, phoneNumber) VALUES
+    (idForFlight, doDepartureReminder, doArrivalUpdates, emailAddr, phoneNo);
+    
+END$$
+DELIMITER ;
+
+CALL AddNotification (1, 1, 1, "helloworld@gmail.com", "15555555555");
+
+
+-- Update user notification settings query
+DROP PROCEDURE IF EXISTS UpdateNotification;
+
+DELIMITER $$
+-- Will ignore updates if given as null
+CREATE PROCEDURE UpdateNotification(notificationId int, doDepartureReminder TINYINT(1), doArrivalUpdates TINYINT(1))
+BEGIN
+    UPDATE Notification
+	SET /*forFlightId = IFNULL(idForFlight,forFlightId),*/
+    departureReminder = IFNULL(doDepartureReminder, departureReminder), 
+    arrivalUpdates = IFNULL(doArrivalUpdates, arrivalUpdates)
+    WHERE id = notificationId;
+    
+END$$
+DELIMITER ;
+
+CALL UpdateNotification (2, /*NULL,*/ 1, NULL);
+
+
+-- Delete existing notification query
+DROP PROCEDURE IF EXISTS DeleteNotification;
+
+DELIMITER $$
+CREATE PROCEDURE DeleteNotification(notificationId int)
+BEGIN
+    DELETE FROM Notification WHERE id = notificationId;
+END$$
+DELIMITER ;
+
+CALL AddNotification (1, 1, 1, "thisshouldbedeleted@gmail.com", "1-555-555-5555");
+CALL DeleteNotification (2);
+

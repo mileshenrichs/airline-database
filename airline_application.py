@@ -30,7 +30,7 @@ class AirlineApplication:
                                             preferredName, dateOfBirth, gender, country, addressLine1, addressLine2,
                                             city, email, phoneType, phoneNumber))
         self.conn.commit()
-        user_id = self._get_results_from_procedure()[0]
+        user_id = self._get_results_from_procedure()[0][0]
         return user_id
 
     # Log in a user by providing credentials (username and password).
@@ -85,3 +85,24 @@ class AirlineApplication:
             tickets.append('%s -> %s  %s #%d  %s  Seat %s (%s class)  Departs at %s' 
                                 % (r[0], r[1], r[2], r[3], r[4], r[5], r[6], self._date_to_str(r[7])))
         return tickets
+
+    # Creates a notification provided departureReminder and arrivalUpdates boolean settings
+    # Returns the id of the newly created notification
+    def create_notification(self, flightId=1, departureReminder=False, arrivalUpdates=False, email='', phoneNumber=''):
+        self.cursor.callproc('AddNotification', (flightId, departureReminder, arrivalUpdates, email, phoneNumber))
+        self.conn.commit()
+        notification_id = self._get_results_from_procedure()[0][0]
+        return notification_id
+
+    # Updates the settings for an existing notification
+    def update_notification(self, notificationId=1, departureReminder=None, arrivalUpdates=None):
+        self.cursor.callproc('UpdateNotification', (notificationId, departureReminder, arrivalUpdates))
+        self.conn.commit()
+
+        return True
+
+    def delete_notification(self, notificationId=1):
+        self.cursor.callproc('DeleteNotification', (notificationId,))
+        self.conn.commit()
+
+        return True

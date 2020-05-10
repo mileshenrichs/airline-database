@@ -9,7 +9,7 @@ def run_demo():
     user_id = app.register_user(username='miles', password='securepassword', firstName='Miles', lastName='Henrichs', 
                                 dateOfBirth='1998-04-09', gender='male', country='United States', addressLine1='415 Elm St', 
                                 city='Iowa City', email='miles-henrichs@uiowa.edu', phoneType='mobile', phoneNumber='3191234567')
-    print('Newly created user id is %d' % (user_id))
+    print('Newly created user id is %d' % (user_id,))
 
     print('\n\n')
 
@@ -53,7 +53,23 @@ def run_demo():
     tickets = app.find_user_trips(userId=1)
     for ticket in tickets:
         print(ticket)
+
+    print('\n\n')
+
+    # Create a notification
+    print('Create a notification')
+    notification_id = app.create_notification(flightId=121, departureReminder=True, arrivalUpdates=False, 
+                                                email='miles-henrichs@uiowa.edu', phoneNumber='3191234567')
+    print(notification_id)
+
+    print('\n\n')
     
+    # Update an existing notification
+    print('Update an existing notification')
+    is_update_successful = app.update_notification(notificationId=notification_id, departureReminder=False, arrivalUpdates=True)
+    print(is_update_successful)
+
+    print('\n\n')
 
 if __name__ == '__main__':
     run_demo()
