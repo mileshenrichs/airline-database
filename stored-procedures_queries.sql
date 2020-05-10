@@ -134,6 +134,7 @@ BEGIN
 	INSERT INTO Notification (forFlightId, departureReminder, arrivalUpdates , emailAddress, phoneNumber) VALUES
     (idForFlight, doDepartureReminder, doArrivalUpdates, emailAddr, phoneNo);
     
+    SELECT LAST_INSERT_ID();
 END$$
 DELIMITER ;
 
@@ -152,7 +153,6 @@ BEGIN
     departureReminder = IFNULL(doDepartureReminder, departureReminder), 
     arrivalUpdates = IFNULL(doArrivalUpdates, arrivalUpdates)
     WHERE id = notificationId;
-    
 END$$
 DELIMITER ;
 
@@ -169,6 +169,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL AddNotification (1, 1, 1, "thisshouldbedeleted@gmail.com", "1-555-555-5555");
+CALL AddNotification (1, 1, 1, "thisshouldbedeleted@gmail.com", "15555555555");
 CALL DeleteNotification (2);
 

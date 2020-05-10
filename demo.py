@@ -69,7 +69,5 @@ def run_demo():
     is_update_successful = app.update_notification(notificationId=notification_id, departureReminder=False, arrivalUpdates=True)
     print(is_update_successful)
 
-    print('\n\n')
-
 if __name__ == '__main__':
     run_demo()
